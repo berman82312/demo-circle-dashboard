@@ -1,8 +1,8 @@
-import { Payment } from "@/types/models";
+import { type Payment } from "@/types/models";
 import { api } from "./base";
 
 export function getPayments() {
-    return api.get('/payments')
+    return api.get<{data: Payment}>('/payments')
 }
 
 export function createPayment(payload: Payment) {
