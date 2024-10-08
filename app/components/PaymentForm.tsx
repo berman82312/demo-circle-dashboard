@@ -1,4 +1,5 @@
 'use client'
+import cloneDeep from "lodash/fp/cloneDeep"
 import { useUsers } from "@/hooks/useUsers"
 import { Currency, type User } from "@/types/models"
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectProps, TextField, Typography } from "@mui/material"
@@ -30,7 +31,7 @@ export const PaymentForm = () => {
 
   function updateUser (field: string, userId: number) {
     const user = users.find(u => u.id === userId)
-    updatePayment(field, user)
+    updatePayment(field, cloneDeep(user))
   }
 
   return (
