@@ -19,6 +19,7 @@ import { useEffect, useState } from "react"
 import { createPayment } from "@/api/payments"
 import axios from "axios"
 import { usePaymentsStore } from "@/hooks/usePaymentsStore"
+import { useNotifications } from "@toolpad/core"
 
 type NewPayment = {
   receiver?: User,
@@ -26,11 +27,6 @@ type NewPayment = {
   currency?: Currency,
   amount: string,
   memo: string
-}
-
-type PaymentFormProps = {
-  onCancel: () => void,
-  onCreated: (payment: Payment) => void
 }
 
 const EmptyPayment = {
@@ -43,24 +39,39 @@ const InitStatus = {
   isStrictValidation: false
 }
 
-export const PaymentForm = (props: PaymentFormProps) => {
+export const PaymentForm = () => {
   const [newPayment, setNewPayment] = useState<NewPayment>(EmptyPayment)
   const [status, setStatus] = useState(InitStatus)
   const { users } = useUsers()
+  const notifications = useNotifications()
   const addPayment = usePaymentsStore(state => state.addPayment)
 
   useEffect(() => {
     let timer: NodeJS.Timeout
+
+    function handleError(message: string, err?: unknown) {
+      notifications.show(message, {
+        autoHideDuration: 3000,
+        severity: 'error'
+      })
+      if(err) {
+        console.error("Payment form error", err)
+      }
+    }
+
     async function tryCreatePayment (payload: Payment) {
       try {
         const response = await createPayment(payload)
         if (response.status === 201) {
           addPayment(payload)
+          notifications.show('Payment created', {
+            severity: 'success',
+            autoHideDuration: 3000
+          })
           resetForm()
-          props.onCreated(payload)
         }
         else {
-          console.warn("Unknown status: ", response)
+          handleError(`Unknown response status: ${response.status}`)
         }
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
@@ -71,11 +82,11 @@ export const PaymentForm = (props: PaymentFormProps) => {
             }, 1000)
           }
           else {
-            console.error("Unexpected server err: ", err)
+            handleError(`Unexpected server error: ${err.message}`, err)
           }
         }
         else {
-          console.error("Unexpected program err: ", err)
+          handleError(`Failed to create payment`, err)
         }
       }
     }
@@ -188,7 +199,6 @@ export const PaymentForm = (props: PaymentFormProps) => {
 
   function onCancel () {
     resetForm()
-    props.onCancel()
   }
 
   function onSubmit () {
@@ -307,7 +317,7 @@ const UserSelector = ({ label, user, users, onChange, error }: UserSelectorProps
       <InputLabel>{label}</InputLabel>
       <Select
         label={label}
-        value={user?.id}
+        value={user?.id ?? ''}
         onChange={onChange}
       >
         {users.map(user => <MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>)}
