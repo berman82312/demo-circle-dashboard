@@ -3,12 +3,23 @@ export type User = {
   name: string
 }
 
+export const Currency = {
+  BTC: 'BTC',
+  GBP: 'GBP',
+  EUR: 'EUR',
+  JPY: 'JPY',
+  USD: 'USD'
+} as const
+
+export type Currency = (typeof Currency)[keyof typeof Currency] 
+
+
 export type Payment = {
   id: string,
   date: string,
   sender: User,
   receiver: User,
   amount: string,
-  currency: 'BTC' | 'GBP' | 'EUR' | 'JPY' | 'USD',
+  currency: Currency,
   memo: string
 }

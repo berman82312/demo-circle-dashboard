@@ -20,7 +20,7 @@ type PaymentItemProps = {
 const PaymentItem = ({ payment }: PaymentItemProps) => {
   const paymentDate = new Date(payment.date)
   return (
-    <Grow in>
+    <Grow in timeout={800}>
       <Card className="w-full">
         <CardContent>
           <Typography

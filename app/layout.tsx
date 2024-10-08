@@ -5,6 +5,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter'
 import theme from './theme'
 import "./globals.css";
 import { PaymentsStoreProvider } from "@/hooks/usePaymentsStore";
+import { CssBaseline } from "@mui/material";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,6 +36,7 @@ export default function RootLayout ({
         <PaymentsStoreProvider>
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
+              <CssBaseline />
               {children}
             </ThemeProvider>
           </AppRouterCacheProvider>
