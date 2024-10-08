@@ -54,16 +54,16 @@ export const PaymentForm = () => {
         autoHideDuration: 3000,
         severity: 'error'
       })
-      if(err) {
+      if (err) {
         console.error("Payment form error", err)
       }
     }
 
-    async function tryCreatePayment (payload: Payment) {
+    async function tryCreatePayment(payload: Payment) {
       try {
         const response = await createPayment(payload)
         if (response.status === 201) {
-          addPayment(payload)
+          addPayment(Object.assign({}, cloneDeep(payload), { createdByUser: true }))
           notifications.show('Payment created', {
             severity: 'success',
             autoHideDuration: 3000
@@ -91,7 +91,7 @@ export const PaymentForm = () => {
       }
     }
 
-    function getPayload (): Payment {
+    function getPayload(): Payment {
       return {
         id: Math.round(Math.random() * 1e16).toString(),
         date: new Date().toISOString(),
@@ -114,19 +114,19 @@ export const PaymentForm = () => {
 
   }, [status.isLoading, addPayment])
 
-  function updatePayment (field: string, value: unknown) {
+  function updatePayment(field: string, value: unknown) {
     setNewPayment(prev => ({
       ...prev,
       [field]: value
     }))
   }
 
-  function updateUser (field: string, userId: number) {
+  function updateUser(field: string, userId: number) {
     const user = users.find(u => u.id === userId)
     updatePayment(field, cloneDeep(user))
   }
 
-  function validateReceiver (isStrict: boolean) {
+  function validateReceiver(isStrict: boolean) {
     if (isStrict && !newPayment.receiver) {
       return "Receiver cannot be empty"
     }
@@ -140,7 +140,7 @@ export const PaymentForm = () => {
     }
   }
 
-  function validateSender (isStrict: boolean) {
+  function validateSender(isStrict: boolean) {
     if (isStrict && !newPayment.sender) {
       return "Sender cannot be empty"
     }
@@ -154,7 +154,7 @@ export const PaymentForm = () => {
     }
   }
 
-  function validateAmount (isStrict: boolean) {
+  function validateAmount(isStrict: boolean) {
     if (isStrict && !newPayment.amount) {
       return "Amount cannot be empty"
     }
@@ -174,13 +174,13 @@ export const PaymentForm = () => {
     }
   }
 
-  function validateCurrency (isStrict: boolean) {
+  function validateCurrency(isStrict: boolean) {
     if (isStrict && !newPayment.currency) {
       return "Must select a currency"
     }
   }
 
-  function validateAll () {
+  function validateAll() {
     const hasError = validateSender(true) || validateReceiver(true) || validateAmount(true) || validateCurrency(true)
     return !!hasError
   }
@@ -192,16 +192,16 @@ export const PaymentForm = () => {
     currency: validateCurrency(status.isStrictValidation),
   }
 
-  function resetForm () {
+  function resetForm() {
     setNewPayment(EmptyPayment)
     setStatus(InitStatus)
   }
 
-  function onCancel () {
+  function onCancel() {
     resetForm()
   }
 
-  function onSubmit () {
+  function onSubmit() {
     if (!status.isStrictValidation) {
       setStatus(prev => ({
         ...prev,

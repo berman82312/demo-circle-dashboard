@@ -21,5 +21,6 @@ export type Payment = {
   receiver: User,
   amount: string,
   currency: Currency,
-  memo: string
+  memo: string,
+  createdByUser?: boolean
 }
