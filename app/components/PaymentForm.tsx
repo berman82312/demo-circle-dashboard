@@ -8,6 +8,7 @@ import {
   CircularProgress,
   FormControl,
   FormHelperText,
+  Grow,
   InputLabel,
   MenuItem,
   Select,
@@ -35,11 +36,33 @@ const EmptyPayment = {
 }
 
 const InitStatus = {
+  show: true,
   isLoading: false,
   isStrictValidation: false
 }
 
 export const PaymentForm = () => {
+  const [showForm, setShowForm] = useState(false)
+
+  function hideForm() {
+    setShowForm(false)
+  }
+
+  if (showForm) {
+    return <ActualPaymentForm onCancel={hideForm} onSubmit={hideForm} />
+  }
+
+  return (
+    <Button fullWidth variant="outlined" onClick={() => setShowForm(true)}>Add Payment</Button>
+  )
+}
+
+type ActualPaymentFormProps = {
+  onCancel: () => void,
+  onSubmit: (payment: Payment) => void 
+}
+
+const ActualPaymentForm = (props: ActualPaymentFormProps) => {
   const [newPayment, setNewPayment] = useState<NewPayment>(EmptyPayment)
   const [status, setStatus] = useState(InitStatus)
   const { users } = useUsers()
@@ -63,12 +86,13 @@ export const PaymentForm = () => {
       try {
         const response = await createPayment(payload)
         if (response.status === 201) {
-          addPayment(Object.assign({}, cloneDeep(payload), { createdByUser: true }))
+          const payment = Object.assign({}, cloneDeep(payload), { createdByUser: true })
+          addPayment(payment)
           notifications.show('Payment created', {
             severity: 'success',
             autoHideDuration: 3000
           })
-          resetForm()
+          resetForm(() => props.onSubmit(payment))
         }
         else {
           handleError(`Unknown response status: ${response.status}`)
@@ -192,13 +216,19 @@ export const PaymentForm = () => {
     currency: validateCurrency(status.isStrictValidation),
   }
 
-  function resetForm() {
+  function resetForm(cb: (...args: any[]) => void) {
     setNewPayment(EmptyPayment)
-    setStatus(InitStatus)
+    setStatus({
+      ...InitStatus,
+      show: false
+    })
+    setTimeout(() => {
+      cb()
+    }, 700)
   }
 
   function onCancel() {
-    resetForm()
+    resetForm(props.onCancel)
   }
 
   function onSubmit() {
@@ -222,59 +252,61 @@ export const PaymentForm = () => {
   }
 
   return (
-    <Box>
-      <Typography variant="h3">Create a new payment</Typography>
-      <div className="py-2 flex">
-        <UserSelector
-          error={errors.sender}
-          label="Sender"
-          user={newPayment.sender}
-          users={users}
-          onChange={e => updateUser('sender', Number(e.target.value))} />
-        <div className="flex items-center justify-center px-4">To</div>
-        <UserSelector
-          error={errors.receiver}
-          label="Receiver"
-          user={newPayment.receiver}
-          users={users}
-          onChange={e => updateUser('receiver', Number(e.target.value))} />
-      </div>
-      <div className="py-2 flex">
-        <TextField
-          fullWidth
-          id='amount'
-          type="number"
-          label="Amount"
-          value={newPayment.amount}
-          slotProps={{
-            htmlInput: {
-              min: 0
-            }
-          }}
-          onKeyDown={(evt) => ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()}
-          onChange={e => updatePayment('amount', e.target.value)}
-          error={!!errors.amount}
-          helperText={errors.amount} />
-        <CurrencySelector
-          value={newPayment.currency ?? ""}
-          onChange={e => updatePayment('currency', e.target.value)}
-          error={errors.currency} />
-      </div>
-      <div className="py-2">
-        <TextField
-          fullWidth
-          id='memo'
-          label="Memo"
-          value={newPayment.memo}
-          onChange={e => updatePayment('memo', e.target.value)} />
-      </div>
-      <div className="py-2 flex justify-between">
-        {status.isLoading ? null : <Button variant="outlined" onClick={onCancel}>Cancel</Button>}
-        <Button variant="contained" disabled={status.isLoading} onClick={onSubmit}>
-          {status.isLoading ? <CircularProgress size={'2rem'} /> : 'Submit'}
-        </Button>
-      </div>
-    </Box>
+    <Grow in={status.show} timeout={500}>
+      <Box>
+        <Typography variant="h3">Create a new payment</Typography>
+        <div className="py-2 flex">
+          <UserSelector
+            error={errors.sender}
+            label="Sender"
+            user={newPayment.sender}
+            users={users}
+            onChange={e => updateUser('sender', Number(e.target.value))} />
+          <div className="flex items-center justify-center px-4">To</div>
+          <UserSelector
+            error={errors.receiver}
+            label="Receiver"
+            user={newPayment.receiver}
+            users={users}
+            onChange={e => updateUser('receiver', Number(e.target.value))} />
+        </div>
+        <div className="py-2 flex">
+          <TextField
+            fullWidth
+            id='amount'
+            type="number"
+            label="Amount"
+            value={newPayment.amount}
+            slotProps={{
+              htmlInput: {
+                min: 0
+              }
+            }}
+            onKeyDown={(evt) => ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()}
+            onChange={e => updatePayment('amount', e.target.value)}
+            error={!!errors.amount}
+            helperText={errors.amount} />
+          <CurrencySelector
+            value={newPayment.currency ?? ""}
+            onChange={e => updatePayment('currency', e.target.value)}
+            error={errors.currency} />
+        </div>
+        <div className="py-2">
+          <TextField
+            fullWidth
+            id='memo'
+            label="Memo"
+            value={newPayment.memo}
+            onChange={e => updatePayment('memo', e.target.value)} />
+        </div>
+        <div className="py-2 flex justify-between">
+          {status.isLoading ? null : <Button variant="outlined" onClick={onCancel}>Cancel</Button>}
+          <Button variant="contained" disabled={status.isLoading} onClick={onSubmit}>
+            {status.isLoading ? <CircularProgress size={'2rem'} /> : 'Submit'}
+          </Button>
+        </div>
+      </Box>
+    </Grow>
   )
 }
 
