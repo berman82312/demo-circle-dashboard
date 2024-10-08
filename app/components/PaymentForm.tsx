@@ -41,28 +41,12 @@ const InitStatus = {
   isStrictValidation: false
 }
 
-export const PaymentForm = () => {
-  const [showForm, setShowForm] = useState(false)
-
-  function hideForm() {
-    setShowForm(false)
-  }
-
-  if (showForm) {
-    return <ActualPaymentForm onCancel={hideForm} onSubmit={hideForm} />
-  }
-
-  return (
-    <Button fullWidth variant="outlined" onClick={() => setShowForm(true)}>Add Payment</Button>
-  )
-}
-
 type ActualPaymentFormProps = {
   onCancel: () => void,
   onSubmit: (payment: Payment) => void 
 }
 
-const ActualPaymentForm = (props: ActualPaymentFormProps) => {
+export const PaymentForm = (props: ActualPaymentFormProps) => {
   const [newPayment, setNewPayment] = useState<NewPayment>(EmptyPayment)
   const [status, setStatus] = useState(InitStatus)
   const { users } = useUsers()

@@ -21,7 +21,7 @@ const PaymentItem = ({ payment }: PaymentItemProps) => {
   const paymentDate = new Date(payment.date)
   return (
     <Grow in timeout={800}>
-      <Card className="w-full" variant="outlined" sx={{ borderColor: payment.createdByUser ? 'rgba(234, 180, 113, 0.7)' : undefined }}>
+      <Card className="w-full min-w-[320px]" variant="outlined" sx={{ borderColor: payment.createdByUser ? 'rgba(234, 180, 113, 0.7)' : undefined }}>
         <CardContent>
           <div className="flex justify-between">
             <Typography
