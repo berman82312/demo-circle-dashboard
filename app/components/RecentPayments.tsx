@@ -1,9 +1,10 @@
-import { usePaymentStore } from "@/store/payments"
+'use client'
+import { usePaymentsStore } from "@/hooks/usePaymentsStore"
 import { type Payment } from "@/types/models"
 import { Card, CardContent, Grow, Typography } from "@mui/material"
 
 export const RecentPayments = () => {
-  const payments = usePaymentStore(state => state.payments)
+  const payments = usePaymentsStore(state => state.payments)
 
   return (
     <>
