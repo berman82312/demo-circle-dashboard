@@ -1,9 +1,24 @@
 'use client'
 import cloneDeep from "lodash/fp/cloneDeep"
 import { useUsers } from "@/hooks/useUsers"
-import { Currency, type User } from "@/types/models"
-import { Box, Button, CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select, type SelectProps, TextField, Typography } from "@mui/material"
-import { useState } from "react"
+import { Currency, Payment, type User } from "@/types/models"
+import {
+  Box,
+  Button,
+  CircularProgress,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  type SelectProps,
+  TextField,
+  Typography
+} from "@mui/material"
+import { useEffect, useState } from "react"
+import { createPayment } from "@/api/payments"
+import axios from "axios"
+import { usePaymentsStore } from "@/hooks/usePaymentsStore"
 
 type NewPayment = {
   receiver?: User,
@@ -11,6 +26,11 @@ type NewPayment = {
   currency?: Currency,
   amount: string,
   memo: string
+}
+
+type PaymentFormProps = {
+  onCancel: () => void,
+  onCreated: (payment: Payment) => void
 }
 
 const EmptyPayment = {
@@ -23,10 +43,65 @@ const InitStatus = {
   isStrictValidation: false
 }
 
-export const PaymentForm = () => {
+export const PaymentForm = (props: PaymentFormProps) => {
   const [newPayment, setNewPayment] = useState<NewPayment>(EmptyPayment)
   const [status, setStatus] = useState(InitStatus)
   const { users } = useUsers()
+  const addPayment = usePaymentsStore(state => state.addPayment)
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    async function tryCreatePayment (payload: Payment) {
+      try {
+        const response = await createPayment(payload)
+        if (response.status === 201) {
+          addPayment(payload)
+          resetForm()
+          props.onCreated(payload)
+        }
+        else {
+          console.warn("Unknown status: ", response)
+        }
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 503) {
+            // Flaky server, auto retry
+            timer = setTimeout(() => {
+              tryCreatePayment(payload)
+            }, 1000)
+          }
+          else {
+            console.error("Unexpected server err: ", err)
+          }
+        }
+        else {
+          console.error("Unexpected program err: ", err)
+        }
+      }
+    }
+
+    function getPayload (): Payment {
+      return {
+        id: Math.round(Math.random() * 1e16).toString(),
+        date: new Date().toISOString(),
+        sender: cloneDeep(newPayment.sender!),
+        receiver: cloneDeep(newPayment.receiver!),
+        amount: Number(newPayment.amount).toString(),
+        currency: newPayment.currency!,
+        memo: newPayment.memo
+      }
+    }
+
+    if (status.isLoading) {
+      const payload = getPayload()
+      tryCreatePayment(payload)
+    }
+
+    return () => {
+      clearTimeout(timer)
+    }
+
+  }, [status.isLoading, addPayment])
 
   function updatePayment (field: string, value: unknown) {
     setNewPayment(prev => ({
@@ -94,7 +169,7 @@ export const PaymentForm = () => {
     }
   }
 
-  function validateAll() {
+  function validateAll () {
     const hasError = validateSender(true) || validateReceiver(true) || validateAmount(true) || validateCurrency(true)
     return !!hasError
   }
@@ -106,9 +181,14 @@ export const PaymentForm = () => {
     currency: validateCurrency(status.isStrictValidation),
   }
 
-  function onCancel () {
+  function resetForm () {
     setNewPayment(EmptyPayment)
     setStatus(InitStatus)
+  }
+
+  function onCancel () {
+    resetForm()
+    props.onCancel()
   }
 
   function onSubmit () {
@@ -119,8 +199,8 @@ export const PaymentForm = () => {
       }))
     }
 
-    const hasError = validateAll() 
-    
+    const hasError = validateAll()
+
     if (hasError) {
       return
     }
@@ -179,7 +259,7 @@ export const PaymentForm = () => {
           onChange={e => updatePayment('memo', e.target.value)} />
       </div>
       <div className="py-2 flex justify-between">
-        <Button variant="outlined" onClick={onCancel}>Cancel</Button>
+        {status.isLoading ? null : <Button variant="outlined" onClick={onCancel}>Cancel</Button>}
         <Button variant="contained" disabled={status.isLoading} onClick={onSubmit}>
           {status.isLoading ? <CircularProgress size={'2rem'} /> : 'Submit'}
         </Button>
