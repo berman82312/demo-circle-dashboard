@@ -200,7 +200,7 @@ export const PaymentForm = (props: PaymentFormProps) => {
     currency: validateCurrency(status.isStrictValidation),
   }
 
-  function resetForm(cb: (...args: any[]) => void) {
+  function resetForm(cb: () => void) {
     setNewPayment(EmptyPayment)
     setStatus({
       ...InitStatus,
