@@ -1,6 +1,7 @@
 'use client'
 import { getPayments } from "@/api/payments";
 import { createPaymentsStore, type PaymentsStore } from "@/store/payments";
+import { NotificationsProvider } from "@toolpad/core";
 import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { useStore } from "zustand";
 
@@ -20,7 +21,7 @@ export const PaymentsStoreProvider = ({
   const storeRef = useRef<PaymentsStoreApi>()
 
   useEffect(() => {
-    async function fetchPayments(addPayment: PaymentsStore['addPayment']) {
+    async function fetchPayments (addPayment: PaymentsStore['addPayment']) {
       try {
         const { data } = await getPayments()
         addPayment(data.data)
@@ -32,7 +33,7 @@ export const PaymentsStoreProvider = ({
 
     let timer: NodeJS.Timeout
 
-    function recursiveFetchPayments() {
+    function recursiveFetchPayments () {
       if (storeRef.current) {
         const addPayment = storeRef.current.getState().addPayment
         fetchPayments(addPayment)
@@ -56,7 +57,18 @@ export const PaymentsStoreProvider = ({
 
   return (
     <PaymentsStoreContext.Provider value={storeRef.current}>
-      {children}
+      <NotificationsProvider
+        slotProps={{
+          snackbar: {
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'center'
+            }
+          }
+        }}
+      >
+        {children}
+      </NotificationsProvider>
     </PaymentsStoreContext.Provider>
   )
 }

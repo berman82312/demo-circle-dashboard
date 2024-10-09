@@ -17,16 +17,16 @@ const valueContains = (target: Object, keyword: string) => {
       if (value.includes(keyword)) {
         return true
       }
+    }
+    else {
+      if (value.includes(keyword)) {
+        return true
+      }
       if (key === 'date') {
         const date = new Date(value)
         if (date.toLocaleString().includes(keyword)) {
           return true
         }
-      }
-    }
-    else {
-      if (value.includes(keyword)) {
-        return true
       }
     }
   }
