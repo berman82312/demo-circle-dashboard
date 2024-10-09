@@ -53,3 +53,13 @@ npm run start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Additional designs
+
+### Toggles for date and memo
+
+Since we can search through all fields returned by the API, it might be awkward that the matched result is due to a hidden attribute not showing on the screen. As a result, I added toggles for date and memo attributes. It is default to show date field and hide the memo field, and user is allow to toggle the visibility of these two fields.
+
+### Highlight the payments created by the current user
+
+Since the recent payment list keeps updating, it might be hard to find the payment just created in some cases. Hence I highlighted the payments created by the currect user with a different border color.
