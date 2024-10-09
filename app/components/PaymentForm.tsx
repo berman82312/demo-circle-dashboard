@@ -41,12 +41,12 @@ const InitStatus = {
   isStrictValidation: false
 }
 
-type ActualPaymentFormProps = {
+type PaymentFormProps = {
   onCancel: () => void,
   onSubmit: (payment: Payment) => void 
 }
 
-export const PaymentForm = (props: ActualPaymentFormProps) => {
+export const PaymentForm = (props: PaymentFormProps) => {
   const [newPayment, setNewPayment] = useState<NewPayment>(EmptyPayment)
   const [status, setStatus] = useState(InitStatus)
   const { users } = useUsers()
