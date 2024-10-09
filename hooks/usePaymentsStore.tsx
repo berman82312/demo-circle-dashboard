@@ -1,7 +1,6 @@
 'use client'
 import { getPayments } from "@/api/payments";
 import { createPaymentsStore, type PaymentsStore } from "@/store/payments";
-import { NotificationsProvider } from "@toolpad/core";
 import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { useStore } from "zustand";
 
@@ -57,18 +56,7 @@ export const PaymentsStoreProvider = ({
 
   return (
     <PaymentsStoreContext.Provider value={storeRef.current}>
-      <NotificationsProvider
-        slotProps={{
-          snackbar: {
-            anchorOrigin: {
-              vertical: 'bottom',
-              horizontal: 'center'
-            }
-          }
-        }}
-      >
-        {children}
-      </NotificationsProvider>
+      {children}
     </PaymentsStoreContext.Provider>
   )
 }
