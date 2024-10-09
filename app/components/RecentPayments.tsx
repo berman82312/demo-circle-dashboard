@@ -5,16 +5,16 @@ import { Search } from "@mui/icons-material"
 import { Card, CardContent, Chip, FormControlLabel, Grow, IconButton, Switch, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 
-const valueContains = (target: Object, keyword: string) => {
-  for (let [key, value] of Object.entries(target)) {
+const valueContains = (target: object, keyword: string) => {
+  for (const [key, value] of Object.entries(target)) {
     if (typeof value === 'object') {
       if (valueContains(value, keyword)) {
         return true
       }
     }
     else if (typeof value !== 'string') {
-      value = String(value)
-      if (value.includes(keyword)) {
+      const stringValue = String(value)
+      if (stringValue.includes(keyword)) {
         return true
       }
     }
@@ -47,7 +47,7 @@ export const RecentPayments = () => {
 
   const filteredPayments = !!search ? payments.filter(hasKeyword(search)) : payments
 
-  function updateStatus(field: string, value: any) {
+  function updateStatus(field: string, value: unknown) {
     setStatus(prev => ({
       ...prev,
       [field]: value
