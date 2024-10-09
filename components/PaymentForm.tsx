@@ -1,26 +1,21 @@
-'use client'
+import { useEffect, useState } from "react"
+import axios from "axios"
 import cloneDeep from "lodash/fp/cloneDeep"
-import { useUsers } from "@/hooks/useUsers"
-import { Currency, Payment, type User } from "@/types/models"
 import {
   Box,
   Button,
   CircularProgress,
-  FormControl,
-  FormHelperText,
   Grow,
-  InputLabel,
-  MenuItem,
-  Select,
-  type SelectProps,
   TextField,
   Typography
 } from "@mui/material"
-import { useEffect, useState } from "react"
-import { createPayment } from "@/api/payments"
-import axios from "axios"
-import { usePaymentsStore } from "@/hooks/usePaymentsStore"
 import { useNotifications } from "@toolpad/core"
+import { createPayment } from "@/api/payments"
+import { CurrencySelector } from "@/components/CurrencySelector"
+import { UserSelector } from "@/components/UserSelector"
+import { usePaymentsStore } from "@/hooks/usePaymentsStore"
+import { useUsers } from "@/hooks/useUsers"
+import { Currency, Payment, type User } from "@/types/models"
 
 type NewPayment = {
   receiver?: User,
@@ -43,7 +38,7 @@ const InitStatus = {
 
 type PaymentFormProps = {
   onCancel: () => void,
-  onSubmit: (payment: Payment) => void 
+  onSubmit: (payment: Payment) => void
 }
 
 export const PaymentForm = (props: PaymentFormProps) => {
@@ -291,54 +286,5 @@ export const PaymentForm = (props: PaymentFormProps) => {
         </div>
       </Box>
     </Grow>
-  )
-}
-
-type CurrencySelectorProps = {
-  value: Currency | "",
-  onChange: SelectProps['onChange'],
-  error?: string
-}
-
-const CurrencySelector = ({ value, onChange, error }: CurrencySelectorProps) => {
-  const hasError = !!error
-  return (
-    <FormControl sx={{ minWidth: 120 }} error={hasError}>
-      <InputLabel>Currency</InputLabel>
-      <Select
-        autoWidth
-        label="Currency"
-        value={value}
-        onChange={onChange}
-      >
-        {Object.keys(Currency).map(currency => <MenuItem key={currency} value={currency}>{currency}</MenuItem>)}
-      </Select>
-      {hasError && <FormHelperText>{error}</FormHelperText>}
-    </FormControl>
-  )
-}
-
-type UserSelectorProps = {
-  user?: User,
-  error?: string,
-  label: string,
-  users: User[],
-  onChange: SelectProps['onChange']
-}
-
-const UserSelector = ({ label, user, users, onChange, error }: UserSelectorProps) => {
-  const hasError = !!error
-  return (
-    <FormControl fullWidth error={hasError}>
-      <InputLabel>{label}</InputLabel>
-      <Select
-        label={label}
-        value={user?.id ?? ''}
-        onChange={onChange}
-      >
-        {users.map(user => <MenuItem key={user.id} value={user.id}>{user.name}</MenuItem>)}
-      </Select>
-      {hasError && <FormHelperText>{error}</FormHelperText>}
-    </FormControl>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
-import { PaymentForm } from "../components/PaymentForm";
 import { useRouter } from "next/navigation";
+import { PaymentForm } from "@/components/PaymentForm";
 
 export default function Create () {
   const router = useRouter()

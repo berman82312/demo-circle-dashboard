@@ -1,7 +1,7 @@
 'use client'
-import { RecentPayments } from "./components/RecentPayments";
-import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { Button, Typography } from "@mui/material";
+import { RecentPayments } from "@/components/RecentPayments";
 
 export default function Home() {
   const router = useRouter()
