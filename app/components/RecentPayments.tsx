@@ -14,12 +14,12 @@ const valueContains = (target: object, keyword: string) => {
     }
     else if (typeof value !== 'string') {
       const stringValue = String(value)
-      if (stringValue.includes(keyword)) {
+      if (stringValue.toLowerCase().includes(keyword)) {
         return true
       }
     }
     else {
-      if (value.includes(keyword)) {
+      if (value.toLowerCase().includes(keyword)) {
         return true
       }
       if (key === 'date') {
@@ -34,7 +34,7 @@ const valueContains = (target: object, keyword: string) => {
 }
 
 const hasKeyword = (keyword: string) => (payment: Payment) => {
-  return valueContains(payment, keyword)
+  return valueContains(payment, keyword.toLowerCase())
 }
 
 export const RecentPayments = () => {

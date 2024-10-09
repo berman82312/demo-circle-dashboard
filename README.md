@@ -63,3 +63,7 @@ Since we can search through all fields returned by the API, it might be awkward 
 ### Highlight the payments created by the current user
 
 Since the recent payment list keeps updating, it might be hard to find the payment just created in some cases. Hence I highlighted the payments created by the currect user with a different border color.
+
+### Search in case insensitive
+
+For user's convenience, search the keyword in case insensitive mode.
