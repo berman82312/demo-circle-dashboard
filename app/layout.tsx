@@ -4,7 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter'
 import theme from './theme'
 import "./globals.css";
-import { PaymentsStoreProvider } from "@/hooks/usePaymentsStore";
+import { PaymentsStoreProvider } from "@/context/PaymentsStoreProvider";
 import { CssBaseline } from "@mui/material";
 import { NotificationsProvider } from "@/context/NotificationsProvider";
 
